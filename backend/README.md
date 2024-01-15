@@ -67,26 +67,259 @@ One note before you delve into your tasks: for each endpoint, you are expected t
 8. Create a `POST` endpoint to get questions to play the quiz. This endpoint should take a category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions.
 9. Create error handlers for all expected errors including 400, 404, 422, and 500.
 
-## Documenting your Endpoints
+API DOCUMENTATION
 
-You will need to provide detailed documentation of your API endpoints including the URL, request parameters, and the response body. Use the example below as a reference.
+Getting Started:
 
-### Documentation Example
+1. Base URL: The backend app is hosted at the default port, http://127.0.0.1:5000/, which is set as a proxy in the frontend configuration.
+2. Authentication: This application does not require authentication.
 
-`GET '/api/v1.0/categories'`
+Endpoints:
 
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-- Request Arguments: None
-- Returns: An object with a single key, `categories`, that contains an object of `id: category_string` key: value pairs.
+`GET /categories`
+
+- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category.
+- Returns all the available categories, success value, and total number of categories.
+
+Example: `curl --location 'localhost:5000/categories'`
+
+Sample Response:
 
 ```json
 {
-  "1": "Science",
-  "2": "Art",
-  "3": "Geography",
-  "4": "History",
-  "5": "Entertainment",
-  "6": "Sports"
+    "categories": [
+        {
+            "id": 1,
+            "type": "Science"
+        },
+        {
+            "id": 2,
+            "type": "Art"
+        }
+    ],
+    "success": true,
+    "total_categories": 6
+}
+```
+
+`GET /questions`
+
+- Fetches a dictionary of questions, paginated in group of 10
+- Returns a list of all questions, success value, total number of questions, current category and list of all the categories.
+
+Example: `curl --location 'localhost:5000/questions'`
+
+Sample Response:
+
+```json
+{
+  "categories": [
+    {
+      "id": 1,
+      "type": "Science"
+    },
+    {
+      "id": 2,
+      "type": "Art"
+    }
+  ],
+  "questions": [
+    {
+      "answer": "Apollo 13",
+      "category": 5,
+      "difficulty": 4,
+      "id": 2,
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    },
+    {
+      "answer": "Tom Cruise",
+      "category": 5,
+      "difficulty": 4,
+      "id": 4,
+      "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+    }
+  ],
+  "success": true,
+  "total_questions": 22
+}
+```
+
+`DELETE /questions/<int:question_id>`
+
+- Delete the selected question based on the question id
+- Returns the success value, deleted question id, list of all the questions available paginated in group of 10 and total number of questions.
+
+Example: `curl --location --request DELETE 'localhost:5000/questions/27'`
+
+Sample Response:
+
+```json
+{
+    "deleted": 27,
+    "questions": [
+        {
+            "answer": "Maya Angelou",
+            "category": 4,
+            "difficulty": 2,
+            "id": 5,
+            "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+        },
+        {
+            "answer": "Muhammad Ali",
+            "category": 4,
+            "difficulty": 1,
+            "id": 9,
+            "question": "What boxer's original name is Cassius Clay?"
+        }
+    ],
+    "success": true,
+    "total_questions": 21
+}
+```
+
+`POST /questions`
+
+- Creates a new question using the submitted question, answer, difficulty and category. 
+- Returns the id of the created question, success value, total questions, and list of all the questions available paginated in group of 10
+
+Example: `curl --location 'localhost:5000/questions' \
+--header 'Content-Type: application/json' \
+--data '{
+    "question":"what is your favorite color?",
+    "answer":"pink",
+    "difficulty": 1,
+    "category": 5
+}'`
+
+Sample Request:
+
+```json
+{
+    "question":"what is your favorite sport?",
+    "answer":"tennis",
+    "difficulty": 1,
+    "category": 6
+}
+```
+
+Sample Response:
+```json
+{
+    "created": 29,
+    "questions": [
+        {
+            "answer": "Maya Angelou",
+            "category": 4,
+            "difficulty": 2,
+            "id": 5,
+            "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+        },
+        {
+            "answer": "Muhammad Ali",
+            "category": 4,
+            "difficulty": 1,
+            "id": 9,
+            "question": "What boxer's original name is Cassius Clay?"
+        }
+    ],
+    "success": true,
+    "total_questions": 22
+}
+```
+
+`POST /questions/search`
+
+- Fetches a dictionary of questions based on the search term submitted in the frondend
+- Returns the list of all questions, success value and total number of questions.
+
+Example: `curl --location --request POST 'localhost:5000/questions/search'`
+
+Sample Response:
+
+```json
+{
+    "questions": [
+        {
+            "answer": "Muhammad Ali",
+            "category": 4,
+            "difficulty": 1,
+            "id": 9,
+            "question": "What boxer's original name is Cassius Clay?"
+        }
+    ],
+    "success": true,
+    "total_questions": 22
+}
+```
+
+`GET /categories/<int:category_id>/questions`
+
+- Fetches a dictionary of questions based on the category id
+- Returns the list of all questions, success value and total number of questions and current category selected.
+
+Example: `curl --location 'localhost:5000/categories/6/questions'`
+
+Sample Response:
+
+```json
+{
+    "current_category": [
+        {
+            "id": 6,
+            "type": "Sports"
+        }
+    ],
+    "questions": [
+        {
+            "answer": "Brazil",
+            "category": 6,
+            "difficulty": 3,
+            "id": 10,
+            "question": "Which is the only team to play in every soccer World Cup tournament?"
+        }
+    ],
+    "success": true,
+    "total_questions": 2
+}
+```
+
+`POST /quizzes`
+
+- This endpoint takes the selected category and previous question parameters.
+- Returns a random questions within the selected category for the quiz and success value. 
+
+Example: `curl --location 'localhost:5000/quizzes' \
+--header 'Content-Type: application/json' \
+--data '{
+    "quizCategory":{
+        "id":4
+    },
+    "previousQuestions":[2,5,9,4]
+}'`
+
+Sample Request:
+
+```json
+{
+    "quizCategory":{
+        "id":4
+    },
+    "previousQuestions":[2,5,9,4]
+}
+```
+
+Sample Response:
+
+```json
+{
+    "question": {
+        "answer": "George Washington Carver",
+        "category": 4,
+        "difficulty": 2,
+        "id": 12,
+        "question": "Who invented Peanut Butter?"
+    },
+    "success": true
 }
 ```
 
