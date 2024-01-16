@@ -34,11 +34,6 @@ class TriviaTestCase(unittest.TestCase):
         """Executed after reach test"""
         pass
 
-    """
-    TODO
-    Write at least one test for each test for successful operation and for expected errors.
-    """
-
     def test_get_categories(self):
         res = self.client().get('/categories')
         data = json.loads(res.data)
@@ -80,7 +75,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['total_questions'])
         self.assertEqual(question, None)
 
-    def test_delete_questions_not_processed(self):
+    def test_delete_questions_for_invalid_id(self):
         res = self.client().delete('/questions/5000')
         data = json.loads(res.data)
 
@@ -97,7 +92,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data["created"])
         self.assertTrue(data['total_questions'])
 
-    def test_create_questions_null(self):
+    def test_create_questions_with_null(self):
         payload = {"question": None, "answer":"Badminton", "category":6, "difficulty":1}
         res = self.client().post('/questions', json=payload)
         data = json.loads(res.data)
@@ -107,7 +102,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource cannot be processed')
 
-    def test_get_question_search(self):
+    def test_get_questions_search(self):
         res = self.client().post('/questions/search')
         data = json.loads(res.data)
 
@@ -126,7 +121,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['total_questions'])
         self.assertTrue(data['current_category'])
 
-    def test_get_category_by_category_not_found(self):
+    def test_get_question_by_category_not_found(self):
         res = self.client().get('/categories/2000/questions')
         data = json.loads(res.data)
 
